@@ -13,9 +13,17 @@ const path = require('path');
 // read a file in async way
 fs.readFile(path.join('starter','txt','start.txt'), 'utf-8',(err, data1) => {
     fs.readFile(path.join('starter','txt', `${data1}`+'.txt'), 'utf-8',(err, data2) => {
-        console.log('Should be here');
-        console.log(path.join('starter','txt','start.txt'));
-        console.log(data2)
+        // console.log(data2);
+        fs.readFile(path.join('starter','txt','append.txt'), 'utf-8',(err, data3) => {
+            // console.log(data3);
+
+            fs.writeFile('./txt/final.txt',`${data2}
+            ${data3}`,'utf-8',err => {
+                console.log('');
+                console.log('Your file has been written');
+            });
+
+        });
 
     });
 });
