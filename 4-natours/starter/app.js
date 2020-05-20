@@ -1,15 +1,21 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 
 const app = express();
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .json({ message: 'Hello from the server side', app: 'Natours' });
-});
+// app.get('/', (req, res) => {
+//   res
+//     .status(200)
+//     .json({ message: 'Hello from the server side', app: 'Natours' });
+// });
 
-app.post('/', (req, res) => {
-  res.send('You can post to this endmpoint...');
-});
+// app.post('/', (req, res) => {
+//   res.send('You can post to this endmpoint...');
+// });
+
+const tours = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'dev-data', 'data', 'tours-simple.json'))
+);
 
 const port = 3000;
 app.listen(port, () => {
