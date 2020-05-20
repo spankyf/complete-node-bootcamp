@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "superagent": "^5.2.2"
+  },
+  "devDependencies": {
+    "prettier": "2.0.5"
   }
 }
