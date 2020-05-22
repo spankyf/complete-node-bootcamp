@@ -1,5 +1,3 @@
-// const fs = require('fs');
-// const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
@@ -9,7 +7,11 @@ const app = express();
 
 // Postman collections https://www.getpostman.com/collections/777b681937a7f1001269
 // 1 Middleware
-app.use(morgan('dev'));
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
