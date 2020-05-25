@@ -7,9 +7,6 @@ const tourRouter = require('./routes/tourRoutes');
 
 const app = express();
 
-const x = 66;
-x = 33;
-
 // Postman collections https://www.getpostman.com/collections/777b681937a7f1001269
 // 1 Middleware
 app.use(morgan('dev'));
