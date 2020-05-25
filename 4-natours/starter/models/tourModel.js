@@ -1,6 +1,39 @@
-const pg = require('pg');
+const dotenv = require('dotenv');
+const { Client } = require('pg');
 
-// https://dev.to/gajus/dynamically-generating-sql-queries-using-node-js-2c1g
-// 'CREATE TABLE tour (name VARCHAR(20) NOT NULL,rating REAL DEFAULT 9.99, price REAL NOT NULL) VALUES (wrds, 2.5, 4.5) ;'
-// 'INSERT INTO tour VALUES ('something', 2.5,4.5);'
-// const queryAddTour =
+dotenv.config({ path: './starter/config.env' });
+exports.insertTour = (bodyRequest) => {
+  const client = new Client({
+    connectionString: process.env.DATABASE.replace(
+      '<PASSWORD>',
+      process.env.DATABASE_PASSWORD
+    ),
+    ssl: { rejectUnauthorized: false }
+  });
+  client.connect();
+  client
+    .query(
+      `INSERT INTO tour SELECT name, rating, price FROM json_populate_record (NULL::tour,'${JSON.stringify(
+        bodyRequest
+      )}');`
+    )
+    .then((res) => 20)
+    .catch((e) => console.error(e.stack))
+    .then(() => client.end());
+};
+
+exports.selectAll = () => {
+  const client = new Client({
+    connectionString: process.env.DATABASE.replace(
+      '<PASSWORD>',
+      process.env.DATABASE_PASSWORD
+    ),
+    ssl: { rejectUnauthorized: false }
+  });
+  client.connect();
+  client
+    .query('SELECT * FROM tour;')
+    .then((res) => console.log(res.rows))
+    .catch((e) => console.error(e.stack))
+    .then(() => client.end());
+};
