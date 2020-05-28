@@ -28,9 +28,6 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// db.tutorials = require('./tutorial.model.js')(
-//   sequelize,
-//   Sequelize
-// );
+db.tours = require('./tourModel')(sequelize, Sequelize);
 
 module.exports = db;
