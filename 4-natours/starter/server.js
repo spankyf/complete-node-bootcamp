@@ -2,8 +2,8 @@ const dotenv = require('dotenv');
 const app = require('./app');
 
 const db = require('./models');
-
-db.sequelize.sync({ force: true }).then(() => {
+// was set to { force: true }, now I changed it and seems to keep the data once server restarted
+db.sequelize.sync().then(() => {
   console.log('Drop and re-sync db.');
 });
 
