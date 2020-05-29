@@ -36,3 +36,20 @@ exports.getAllTours = async (req, res) => {
     });
   }
 };
+
+exports.getTour = async (req, res) => {
+  // Validate request
+  try {
+    const tour = await Tour.findByPk(req.params.id);
+
+    res.status(200).json({
+      status: 'success',
+      data: tour
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    });
+  }
+};
