@@ -53,3 +53,42 @@ exports.getTour = async (req, res) => {
     });
   }
 };
+
+exports.updateTour = async (req, res) => {
+  // Validate request
+  try {
+    const updatedTour = await Tour.update(req.body, {
+      where: { id: req.params.id },
+      returning: true
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: updatedTour
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    });
+  }
+};
+
+exports.deleteTour = async (req, res) => {
+  // Validate request
+  try {
+    await Tour.destroy({
+      where: { id: req.params.id }
+    });
+
+    res.status(204).json({
+      status: 'success'
+      // data: deletedTour
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    });
+  }
+};

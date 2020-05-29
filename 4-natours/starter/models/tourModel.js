@@ -12,7 +12,10 @@ module.exports = (sequelize, Sequelize) => {
       unique: true
     },
     rating: {
-      type: Sequelize.REAL
+      type: Sequelize.REAL,
+      validate: {
+        isNumeric: true
+      }
     },
     price: {
       type: Sequelize.REAL,
