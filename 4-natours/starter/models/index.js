@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const Sequelize = require('sequelize');
+const sequelizeTransforms = require('sequelize-transforms');
 
 dotenv.config({ path: './starter/config.env' });
 
@@ -27,6 +28,7 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+sequelizeTransforms(sequelize);
 
 db.tours = require('./tourModel')(sequelize, Sequelize);
 
