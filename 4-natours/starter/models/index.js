@@ -3,7 +3,6 @@ const Sequelize = require('sequelize');
 const sequelizeTransforms = require('sequelize-transforms');
 
 dotenv.config({ path: './starter/config.env' });
-
 const URI = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
