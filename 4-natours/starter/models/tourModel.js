@@ -1,13 +1,14 @@
 module.exports = (sequelize, Sequelize) => {
   const Tour = sequelize.define('tours', {
     id: {
-      type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV1,
+      // type: Sequelize.UUID,
+      // defaultValue: Sequelize.UUIDV1,
+      type: Sequelize.INTEGER,
       primaryKey: true,
       unique: true
     },
     name: {
-      type: Sequelize.STRING(50),
+      type: Sequelize.STRING(2000),
       allowNull: false,
       unique: true
     },
@@ -44,7 +45,7 @@ module.exports = (sequelize, Sequelize) => {
       }
     },
     difficulty: {
-      type: Sequelize.STRING(50),
+      type: Sequelize.STRING(2000),
       allowNull: false,
       validate: {
         notNull: {
@@ -60,7 +61,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.REAL
     },
     summary: {
-      type: Sequelize.STRING(500),
+      type: Sequelize.STRING(2000),
       allowNull: false,
       trim: true,
       validate: {
@@ -70,11 +71,11 @@ module.exports = (sequelize, Sequelize) => {
       }
     },
     description: {
-      type: Sequelize.STRING(500),
+      type: Sequelize.STRING(2000),
       trim: true
     },
     imageCover: {
-      type: Sequelize.STRING(50),
+      type: Sequelize.STRING(2000),
       allowNull: false,
       validate: {
         notNull: {
@@ -82,7 +83,9 @@ module.exports = (sequelize, Sequelize) => {
         }
       }
     },
-    images: { type: Sequelize.ARRAY(Sequelize.STRING(50)) },
+    images: {
+      type: Sequelize.ARRAY(Sequelize.STRING(2000))
+    },
     startDates: { type: Sequelize.ARRAY(Sequelize.DATE) }
   });
 
