@@ -28,6 +28,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 sequelizeTransforms(sequelize);
+db.Op = Sequelize.Op;
 
 db.tours = require('./tourModel')(sequelize, Sequelize);
 

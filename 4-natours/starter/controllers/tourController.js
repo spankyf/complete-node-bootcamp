@@ -1,9 +1,9 @@
 const db = require('../models');
-const { Op } = db.sequelize;
+const Op = db.Op;
+
 const Tour = db.tours;
 
 exports.createTour = async (req, res) => {
-  // Validate request
   try {
     const newTour = await Tour.create(req.body);
 
@@ -30,26 +30,31 @@ exports.getAllTours = async (req, res) => {
     ];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // let queryStr = JSON.stringify(queryObj);
-    // queryStr = queryStr.replace(
-    //   /\b(gte|gt|lte|lt)\b/g,
-    //   (match) => `$${match}`
-    // );
-    // console.log(JSON.parse(queryStr));
-    const opDict = {
-      gte: Op.gte,
-      gt: Op.gt,
-      lt: Op.lt,
-      lte: Op.lte
-    };
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
 
-    const foundTour = await Tour.findAll({
-      where: queryStr
+    console.log(req.query, typeof req.query);
+    console.log(
+      JSON.parse(queryStr),
+      typeof JSON.parse(queryStr)
+    );
+    // console.log({ duration: { $gte: '5' } });
+
+    const query = Tour.findAll({
+      where: {
+        duration: { [Op.gte]: 7 }
+      }
     });
+
+    const tours = await query;
+
     res.status(201).json({
       status: 'success',
-      results: foundTour.length,
-      data: foundTour
+      results: tours.length,
+      data: tours
     });
   } catch (err) {
     res.status(404).json({
