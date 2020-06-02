@@ -30,12 +30,18 @@ exports.getAllTours = async (req, res) => {
     ];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-    console.log(JSON.parse(queryStr));
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(
+    //   /\b(gte|gt|lte|lt)\b/g,
+    //   (match) => `$${match}`
+    // );
+    // console.log(JSON.parse(queryStr));
+    const opDict = {
+      gte: Op.gte,
+      gt: Op.gt,
+      lt: Op.lt,
+      lte: Op.lte
+    };
 
     const foundTour = await Tour.findAll({
       where: queryStr
