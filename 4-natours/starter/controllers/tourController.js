@@ -30,18 +30,20 @@ exports.getAllTours = async (req, res) => {
     ];
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    const matchDict = { gte: Op.gte };
+
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(
       /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
+      (match) => matchDict[match]
     );
 
+    console.log(matchDict['asshole']);
     console.log(req.query, typeof req.query);
     console.log(
       JSON.parse(queryStr),
       typeof JSON.parse(queryStr)
     );
-    // console.log({ duration: { $gte: '5' } });
 
     const query = Tour.findAll({
       where: {
