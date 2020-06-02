@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+dotenv.config({ path: './starter/config.env' });
 const app = require('./app');
 
 const db = require('./models');
@@ -6,8 +7,6 @@ const db = require('./models');
 db.sequelize.sync().then(() => {
   console.log('Drop and re-sync db.');
 });
-
-dotenv.config({ path: './starter/config.env' });
 
 const port = process.env.PORT || 3000;
 

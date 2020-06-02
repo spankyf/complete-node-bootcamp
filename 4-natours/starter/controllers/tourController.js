@@ -1,5 +1,5 @@
 const db = require('../models');
-
+const { Op } = db.sequelize;
 const Tour = db.tours;
 
 exports.createTour = async (req, res) => {
@@ -20,14 +20,30 @@ exports.createTour = async (req, res) => {
 };
 
 exports.getAllTours = async (req, res) => {
-  // Validate request
   try {
-    const tours = await Tour.findAll();
+    const queryObj = { ...req.query };
+    const excludedFields = [
+      'page',
+      'sort',
+      'limit',
+      'fields'
+    ];
+    excludedFields.forEach((el) => delete queryObj[el]);
 
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
+    console.log(JSON.parse(queryStr));
+
+    const foundTour = await Tour.findAll({
+      where: queryStr
+    });
     res.status(201).json({
       status: 'success',
-      results: tours.length,
-      data: tours
+      results: foundTour.length,
+      data: foundTour
     });
   } catch (err) {
     res.status(404).json({
