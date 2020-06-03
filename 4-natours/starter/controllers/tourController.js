@@ -22,33 +22,37 @@ exports.createTour = async (req, res) => {
 exports.getAllTours = async (req, res) => {
   try {
     const queryObj = { ...req.query };
-    const excludedFields = [
-      'page',
-      'sort',
-      'limit',
-      'fields'
-    ];
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    const matchDict = { gte: Op.gte };
+    const testString = 'gte';
 
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => matchDict[match]
-    );
+    const checkStr = (testStr) => {
+      let rtnStr;
 
-    console.log(matchDict['asshole']);
-    console.log(req.query, typeof req.query);
-    console.log(
-      JSON.parse(queryStr),
-      typeof JSON.parse(queryStr)
-    );
-
-    const query = Tour.findAll({
-      where: {
-        duration: { [Op.gte]: 7 }
+      if (testStr === 'gte') {
+        rtnStr = Op.gte;
+      } else {
+        rtnStr = 'nothing';
       }
+      const testQry = { duration: { [rtnStr]: 7 } };
+      return testQry;
+    };
+
+    const resulto = checkStr(testString);
+    console.log(resulto);
+    console.log({ duration: { [Op.gte]: 7 } });
+    // const dict = { gte: Op.gte };
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => dict[match]);
+
+    // console.log();
+    // console.log(req.query, typeof req.query);
+    // console.log(JSON.parse(queryStr), typeof JSON.parse(queryStr));
+
+    // const desiredQuery = { duration: { [Op.gte]: 7 } };
+    const query = Tour.findAll({
+      where: resulto
     });
 
     const tours = await query;
