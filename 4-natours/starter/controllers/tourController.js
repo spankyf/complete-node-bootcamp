@@ -43,12 +43,13 @@ exports.getAllTours = async (req, res) => {
     console.log(resulto);
     console.log({ duration: { [Op.gte]: 7 } });
     // const dict = { gte: Op.gte };
-    // let queryStr = JSON.stringify(queryObj);
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => dict[match]);
+    console.log(queryObj);
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => checkStr(match));
 
     // console.log();
     // console.log(req.query, typeof req.query);
-    // console.log(JSON.parse(queryStr), typeof JSON.parse(queryStr));
+    console.log(JSON.parse(queryStr), typeof queryStr);
 
     // const desiredQuery = { duration: { [Op.gte]: 7 } };
     const query = Tour.findAll({
