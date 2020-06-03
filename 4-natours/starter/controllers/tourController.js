@@ -3,6 +3,32 @@ const Op = db.Op;
 
 const Tour = db.tours;
 
+function adjustQuery(query) {
+  const keys = Object.keys(query);
+  for (let i = 0; i < keys.length; i += 1) {
+    const test = Object.getOwnPropertyNames(query[keys[i]]).toString();
+
+    switch (test) {
+      case 'gte':
+        query[keys[i]] = { [Op.gte]: query[keys[i]].gte };
+        break;
+      case 'lte':
+        query[keys[i]] = { [Op.lte]: query[keys[i]].lte };
+        break;
+      case 'lt':
+        query[keys[i]] = { [Op.lt]: query[keys[i]].lt };
+        break;
+      case 'gt':
+        query[keys[i]] = { [Op.gt]: query[keys[i]].gt };
+        break;
+      default:
+        // test = test;
+        break;
+    }
+  }
+  return query;
+}
+
 exports.createTour = async (req, res) => {
   try {
     const newTour = await Tour.create(req.body);
@@ -25,35 +51,10 @@ exports.getAllTours = async (req, res) => {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    const testString = 'gte';
+    const advancedQuery = adjustQuery(queryObj);
 
-    const checkStr = (testStr) => {
-      let rtnStr;
-
-      if (testStr === 'gte') {
-        rtnStr = Op.gte;
-      } else {
-        rtnStr = 'nothing';
-      }
-      const testQry = { duration: { [rtnStr]: 7 } };
-      return testQry;
-    };
-
-    const resulto = checkStr(testString);
-    console.log(resulto);
-    console.log({ duration: { [Op.gte]: 7 } });
-    // const dict = { gte: Op.gte };
-    console.log(queryObj);
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => checkStr(match));
-
-    // console.log();
-    // console.log(req.query, typeof req.query);
-    console.log(JSON.parse(queryStr), typeof queryStr);
-
-    // const desiredQuery = { duration: { [Op.gte]: 7 } };
     const query = Tour.findAll({
-      where: resulto
+      where: advancedQuery
     });
 
     const tours = await query;
