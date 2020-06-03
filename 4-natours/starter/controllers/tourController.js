@@ -1,9 +1,29 @@
 const db = require('../models');
-const Op = db.Op;
 
+const Op = db.Op;
 const Tour = db.tours;
 
-function adjustQuery(query) {
+function sortQuery(query) {
+  function useDesc(str) {
+    return str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'];
+  }
+
+  const sortKeys = Object.keys(query);
+  for (let i = 0; i < sortKeys.length; i += 1) {
+    if (sortKeys[i].toString() === 'sort') {
+      const sortingFields = query[sortKeys[i]].split(',');
+      const orderArray = [];
+      sortingFields.forEach((element) => {
+        orderArray.push(useDesc(element));
+      });
+      query.order = orderArray;
+      delete query.sort;
+    }
+  }
+  return query;
+}
+
+function advancedQuery(query) {
   const keys = Object.keys(query);
   for (let i = 0; i < keys.length; i += 1) {
     const test = Object.getOwnPropertyNames(query[keys[i]]).toString();
@@ -22,7 +42,6 @@ function adjustQuery(query) {
         query[keys[i]] = { [Op.gt]: query[keys[i]].gt };
         break;
       default:
-        // test = test;
         break;
     }
   }
@@ -51,10 +70,19 @@ exports.getAllTours = async (req, res) => {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    const advancedQuery = adjustQuery(queryObj);
+    let filteredQuery = advancedQuery(req.query);
+
+    // if (req.query.sort) {
+    //   filteredQuery = sortQuery(advancedQuery(req.query));
+    // }
+
+    console.log(req.query);
+    console.log(filteredQuery);
+    console.log(sortQuery(req.query));
+    // console.log(filteredQuery);
 
     const query = Tour.findAll({
-      where: advancedQuery
+      where: filteredQuery
     });
 
     const tours = await query;
