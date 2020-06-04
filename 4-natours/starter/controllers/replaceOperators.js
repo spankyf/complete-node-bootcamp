@@ -1,13 +1,10 @@
 const _ = require('lodash');
-const testQuery = {
-  order: [['price', 'DESC']],
-  where: {
-    price: { gte: '1500' },
-    duration: { lte: '14' },
-    fields: 'name,duration'
-  }
-};
 
+const testQuery = {
+  attributes: ['name', 'duration', 'price'],
+  where: { page: '1', limit: '3', price: { gte: '1000' } },
+  order: [['price', 'ASC']]
+};
 function adjustQuery(query) {
   const keys = Object.keys(query);
   for (let i = 0; i < keys.length; i += 1) {
@@ -69,4 +66,28 @@ function selectQueryFields(query) {
   return result;
 }
 
-console.log(selectQueryFields(sortQuery(testQuery)));
+function paginateQuery(query) {
+  let pageNumber;
+  let limitNumber;
+  if (Object.keys(query.where).includes('page') || Object.keys(query.where).includes('limit')) {
+    if (Object.keys(query.where).includes('page')) {
+      pageNumber = query.where.page * 1;
+    } else {
+      pageNumber = 1;
+    }
+    if (Object.keys(query.where).includes('limit')) {
+      limitNumber = query.where.limit * 1;
+    } else {
+      limitNumber = 10;
+    }
+    query.limit = limitNumber;
+    query.offset = pageNumber;
+    delete query.where.page;
+    delete query.where.limit;
+  } else {
+    console.log('no pagnation');
+  }
+  return query;
+}
+
+console.log(paginateQuery(selectQueryFields(sortQuery(testQuery))));

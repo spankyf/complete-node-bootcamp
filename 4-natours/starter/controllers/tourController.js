@@ -2,7 +2,32 @@ const _ = require('lodash');
 const db = require('../models');
 
 const Op = db.Op;
+// const { docs, pages, total } = db.paginate();
 const Tour = db.tours;
+
+function paginateQuery(query) {
+  let pageNumber;
+  let limitNumber;
+  if (Object.keys(query.where).includes('page') || Object.keys(query.where).includes('limit')) {
+    if (Object.keys(query.where).includes('page')) {
+      pageNumber = query.where.page * 1;
+    } else {
+      pageNumber = 1;
+    }
+    if (Object.keys(query.where).includes('limit')) {
+      limitNumber = query.where.limit * 1;
+    } else {
+      limitNumber = 10;
+    }
+    query.limit = limitNumber;
+    query.offset = (pageNumber - 1) * limitNumber;
+    delete query.where.page;
+    delete query.where.limit;
+  } else {
+    console.log('no pagnation');
+  }
+  return query;
+}
 
 function selectFields(query) {
   let result;
@@ -90,9 +115,9 @@ exports.getAllTours = async (req, res) => {
 
     const filteredQuery = advancedQuery(req.query); // advanced filtering
     const sortedQuery = sortQuery(filteredQuery); // sort function
-    console.log(sortedQuery, 'query AFTER sorting');
+    const fieldFilteredQuery = selectFields(sortedQuery); // limit fields by query
+    const query = paginateQuery(fieldFilteredQuery); // add pagination
 
-    const query = selectFields(sortedQuery);
     console.log(query, 'query After fields');
 
     const tours = await Tour.findAll(query);
@@ -111,7 +136,6 @@ exports.getAllTours = async (req, res) => {
 };
 
 exports.getTour = async (req, res) => {
-  // Validate request
   try {
     const tour = await Tour.findByPk(req.params.id);
 
@@ -128,7 +152,6 @@ exports.getTour = async (req, res) => {
 };
 
 exports.updateTour = async (req, res) => {
-  // Validate request
   try {
     const updatedTour = await Tour.update(req.body, {
       where: { id: req.params.id },

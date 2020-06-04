@@ -1,12 +1,10 @@
 const dotenv = require('dotenv');
 const Sequelize = require('sequelize');
-const sequelizeTransforms = require('sequelize-transforms');
+// const sequelizeTransforms = require('sequelize-transforms');
+const sequelizePaginate = require('sequelize-paginate');
 
 dotenv.config({ path: './starter/config.env' });
-const URI = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const URI = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 const sequelize = new Sequelize(URI, {
   dialectOptions: {
@@ -27,7 +25,8 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-sequelizeTransforms(sequelize);
+sequelizePaginate.paginate(sequelize);
+// sequelizeTransforms(sequelize);
 db.Op = Sequelize.Op;
 
 db.tours = require('./tourModel')(sequelize, Sequelize);
