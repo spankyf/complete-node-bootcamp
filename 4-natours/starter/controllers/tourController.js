@@ -2,8 +2,14 @@ const _ = require('lodash');
 const db = require('../models');
 
 const Op = db.Op;
-// const { docs, pages, total } = db.paginate();
 const Tour = db.tours;
+
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 function paginateQuery(query) {
   let pageNumber;
