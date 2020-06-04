@@ -8,12 +8,12 @@ function selectFields(query) {
   let result;
   if (Object.keys(query.where).includes('fields')) {
     const wherePart = _.cloneDeep(query.where); // make a deep copy
-    const sortPart = _.cloneDeep(query.sort); // make a deep copy
+    const sortPart = _.cloneDeep(query.order); // make a deep copy
     delete wherePart.fields;
     result = {
       attributes: query.where.fields.split(','),
       where: wherePart,
-      sort: sortPart
+      order: sortPart
     };
   } else {
     result = query;
@@ -90,8 +90,10 @@ exports.getAllTours = async (req, res) => {
 
     const filteredQuery = advancedQuery(req.query); // advanced filtering
     const sortedQuery = sortQuery(filteredQuery); // sort function
+    console.log(sortedQuery, 'query AFTER sorting');
+
     const query = selectFields(sortedQuery);
-    console.log(query, 'query up to now');
+    console.log(query, 'query After fields');
 
     const tours = await Tour.findAll(query);
 
