@@ -1,10 +1,12 @@
-// const testQuery = {
-//   price: { gte: '1500' },
-//   duration: { lt: '14' },
-//   sort: '-price,ratingsAverage'
-// };
-// -price,ratingsAverage
-const testQuery = { where: { duration: { gte: '9' }, sort: 'price' } };
+const _ = require('lodash');
+const testQuery = {
+  order: [['price', 'DESC']],
+  where: {
+    price: { gte: '1500' },
+    duration: { lte: '14' },
+    fields: 'name,duration'
+  }
+};
 
 function adjustQuery(query) {
   const keys = Object.keys(query);
@@ -50,4 +52,21 @@ function sortQuery(query) {
   return result;
 }
 
-console.log(sortQuery(testQuery));
+function selectQueryFields(query) {
+  let result;
+  if (Object.keys(query.where).includes('fields')) {
+    const wherePart = _.cloneDeep(query.where); // make a deep copy
+    const sortPart = _.cloneDeep(query.sort); // make a deep copy
+    delete wherePart.fields;
+    result = {
+      attributes: query.where.fields.split(','),
+      where: wherePart,
+      sort: sortPart
+    };
+  } else {
+    result = query;
+  }
+  return result;
+}
+
+console.log(selectQueryFields(sortQuery(testQuery)));

@@ -1,8 +1,25 @@
-const db = require('../models');
 const _ = require('lodash');
+const db = require('../models');
 
 const Op = db.Op;
 const Tour = db.tours;
+
+function selectFields(query) {
+  let result;
+  if (Object.keys(query.where).includes('fields')) {
+    const wherePart = _.cloneDeep(query.where); // make a deep copy
+    const sortPart = _.cloneDeep(query.sort); // make a deep copy
+    delete wherePart.fields;
+    result = {
+      attributes: query.where.fields.split(','),
+      where: wherePart,
+      sort: sortPart
+    };
+  } else {
+    result = query;
+  }
+  return result;
+}
 
 function sortQuery(query) {
   let result;
@@ -72,7 +89,10 @@ exports.getAllTours = async (req, res) => {
     excludedFields.forEach((el) => delete queryObj[el]);
 
     const filteredQuery = advancedQuery(req.query); // advanced filtering
-    const query = sortQuery(filteredQuery); // sort function
+    const sortedQuery = sortQuery(filteredQuery); // sort function
+    const query = selectFields(sortedQuery);
+    console.log(query, 'query up to now');
+
     const tours = await Tour.findAll(query);
 
     res.status(201).json({
