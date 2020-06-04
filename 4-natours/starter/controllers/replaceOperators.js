@@ -1,10 +1,10 @@
-// const testQuery = { duration: { gte: '8' }, price: { lte: '2000' }, difficulty: 'medium' };
-const testQuery = {
-  price: { gte: '1500' },
-  duration: { lt: '14' },
-  sort: '-price,ratingsAverage'
-};
+// const testQuery = {
+//   price: { gte: '1500' },
+//   duration: { lt: '14' },
+//   sort: '-price,ratingsAverage'
+// };
 // -price,ratingsAverage
+const testQuery = { where: { duration: { gte: '9' }, sort: 'price' } };
 
 function adjustQuery(query) {
   const keys = Object.keys(query);
@@ -33,38 +33,21 @@ function adjustQuery(query) {
 }
 
 function sortQuery(query) {
-  function sortOrder(str) {
-    return str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'];
+  let result;
+  if (Object.keys(query.where).includes('sort')) {
+    console.log('hello sort');
+    const wherePart = JSON.parse(JSON.stringify(query.where)); // make a deep copy
+    delete wherePart.sort;
+    result = {
+      order: query.where.sort
+        .split(',')
+        .map((str) => (str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'])),
+      where: wherePart
+    };
+  } else {
+    result = query;
   }
-
-  const sortKeys = Object.keys(query);
-  for (let i = 0; i < sortKeys.length; i += 1) {
-    if (sortKeys[i].toString() === 'sort') {
-      const sortingFields = query[sortKeys[i]].split(',');
-      const orderArray = [];
-      sortingFields.forEach((element) => {
-        orderArray.push(sortOrder(element));
-      });
-      query.order = orderArray;
-      // console.log(sortKeys);
-      delete query.sort;
-      //  this needs to have separate where and order objects.The where can come from the other filterQuery
-    }
-  }
-  return query;
-}
-// const a = adjustQuery(testQuery);
-// console.log(a);
-// console.log('               ************');
-// const b = sortQuery(testQuery);
-// console.log(b);
-
-function sortOrder(str) {
-  return str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'];
+  return result;
 }
 
-if (Object.keys(testQuery).includes('sort')) {
-  console.log('has a sort fn');
-} else {
-  console.log('no sort');
-}
+console.log(sortQuery(testQuery));

@@ -1,26 +1,27 @@
 const db = require('../models');
+const _ = require('lodash');
 
 const Op = db.Op;
 const Tour = db.tours;
 
 function sortQuery(query) {
-  function useDesc(str) {
-    return str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'];
+  let result;
+  const wherePart = _.cloneDeep(query.where); // make a deep copy
+  if (Object.keys(query.where).includes('sort')) {
+    delete wherePart.sort;
+    result = {
+      order: query.where.sort
+        .split(',')
+        .map((str) => (str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'])),
+      where: wherePart
+    };
+  } else {
+    result = {
+      order: [['price', 'DESC']],
+      where: wherePart
+    };
   }
-
-  const sortKeys = Object.keys(query);
-  for (let i = 0; i < sortKeys.length; i += 1) {
-    if (sortKeys[i].toString() === 'sort') {
-      const sortingFields = query[sortKeys[i]].split(',');
-      const orderArray = [];
-      sortingFields.forEach((element) => {
-        orderArray.push(useDesc(element));
-      });
-      query.order = orderArray;
-      delete query.sort;
-    }
-  }
-  return query;
+  return result;
 }
 
 function advancedQuery(query) {
@@ -45,7 +46,7 @@ function advancedQuery(query) {
         break;
     }
   }
-  return query;
+  return { where: query };
 }
 
 exports.createTour = async (req, res) => {
@@ -70,22 +71,9 @@ exports.getAllTours = async (req, res) => {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    let filteredQuery = advancedQuery(req.query);
-
-    // if (req.query.sort) {
-    //   filteredQuery = sortQuery(advancedQuery(req.query));
-    // }
-
-    console.log(req.query);
-    console.log(filteredQuery);
-    console.log(sortQuery(req.query));
-    // console.log(filteredQuery);
-
-    const query = Tour.findAll({
-      where: filteredQuery
-    });
-
-    const tours = await query;
+    const filteredQuery = advancedQuery(req.query); // advanced filtering
+    const query = sortQuery(filteredQuery); // sort function
+    const tours = await Tour.findAll(query);
 
     res.status(201).json({
       status: 'success',
