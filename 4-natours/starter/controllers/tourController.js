@@ -3,7 +3,7 @@ const db = require('../models');
 
 const Op = db.Op;
 const Tour = db.tours;
-console.log(process.env);
+
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
@@ -115,6 +115,7 @@ exports.createTour = async (req, res) => {
 
 exports.getAllTours = async (req, res) => {
   try {
+    console.log(req.query, '   Is the original query');
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);

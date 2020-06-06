@@ -4,43 +4,41 @@ const Op = db.Op;
 const Tour = db.tours;
 
 const testo = {
-  attributes: ['name', 'duration', 'price'],
-  where: { page: '1', limit: '3', price: { gte: '1000' } },
-  order: [['price', 'ASC']]
+  duration: { gte: '7' },
+  page: '2',
+  limit: '3',
+  fields: 'name,duration,price'
 };
 
 class APIFeatures {
-  constructor(query, queryString) {
+  constructor(query, queryJSON) {
     this.query = query;
-    this.queryString = queryString;
+    this.queryJSON = queryJSON;
   }
 
-  filter(query) {
-    const keys = Object.keys(query);
-    for (let i = 0; i < keys.length; i += 1) {
-      const test = Object.getOwnPropertyNames(query[keys[i]]).toString();
-
-      switch (test) {
-        case 'gte':
-          query[keys[i]] = { [Op.gte]: query[keys[i]].gte };
-          break;
-        case 'lte':
-          query[keys[i]] = { [Op.lte]: query[keys[i]].lte };
-          break;
-        case 'lt':
-          query[keys[i]] = { [Op.lt]: query[keys[i]].lt };
-          break;
-        case 'gt':
-          query[keys[i]] = { [Op.gt]: query[keys[i]].gt };
-          break;
-        default:
-          break;
-      }
+  limitFields() {
+    if (Object.keys(this.queryJSON).includes('fields')) {
+      this.queryJSON.attributes = this.queryJSON.fields.split(',');
+      delete this.queryJSON.fields;
     }
-    return { where: query };
+  }
+
+  paginate() {
+    // let pageNumber;
+    // let offset;
+    if (Object.keys(this.queryJSON).includes('page')) {
+      this.queryJSON.page = this.queryJSON.page * 1;
+    } else {
+      this.queryJSON.page = 1;
+    }
+    if (Object.keys(this.queryJSON).includes('limit')) {
+      this.queryJSON.offset = (this.queryJSON.page - 1) * (this.queryJSON.limit * 1); //(pageNumber - 1) * limitNumber
+    } else {
+      this.queryJSON.offset = (this.queryJSON.page - 1) * 5;
+    }
+    delete this.queryJSON.limit;
+    console.log(this.queryJSON);
   }
 }
 
-const features = new APIFeatures(Tour.findAll(), testo).filter();
-const tours = features.query;
-console.log(tours);
+const features = new APIFeatures(Tour.findAll(), testo).paginate();
