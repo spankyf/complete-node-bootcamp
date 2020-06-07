@@ -7,12 +7,12 @@ const testo = {
   duration: { gte: '7' },
   page: '2',
   limit: '3',
+  sort: '-price,duration',
   fields: 'name,duration,price'
 };
 
 class APIFeatures {
-  constructor(query, queryJSON) {
-    this.query = query;
+  constructor(queryJSON) {
     this.queryJSON = queryJSON;
   }
 
@@ -23,22 +23,40 @@ class APIFeatures {
     }
   }
 
+  order() {
+    if (Object.keys(this.queryJSON).includes('sort')) {
+      this.queryJSON.order = this.queryJSON.sort
+        .split(',')
+        .map((str) => (str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC']));
+    }
+  }
+
   paginate() {
-    // let pageNumber;
-    // let offset;
-    if (Object.keys(this.queryJSON).includes('page')) {
-      this.queryJSON.page = this.queryJSON.page * 1;
-    } else {
-      this.queryJSON.page = 1;
-    }
-    if (Object.keys(this.queryJSON).includes('limit')) {
-      this.queryJSON.offset = (this.queryJSON.page - 1) * (this.queryJSON.limit * 1); //(pageNumber - 1) * limitNumber
-    } else {
-      this.queryJSON.offset = (this.queryJSON.page - 1) * 5;
-    }
+    this.queryJSON.page = Object.keys(this.queryJSON).includes('page') ? this.queryJSON.page * 1 : 1;
+    this.queryJSON.offset = Object.keys(this.queryJSON).includes('limit') ? this.queryJSON.limit * 1 : 5;
     delete this.queryJSON.limit;
-    console.log(this.queryJSON);
+  }
+
+  filter() {
+    let found = [];
+    ['page', 'limit', 'fields', 'sort'].some((r) => Object.keys(this.queryJSON).includes(r));
+    console.log(found);
+  }
+
+  findAll() {
+    Tour.findAll(this.queryJSON);
   }
 }
 
-const features = new APIFeatures(Tour.findAll(), testo).paginate();
+const features = new APIFeatures(testo); //.findAll(); //.paginate();
+console.log(features);
+features.limitFields();
+console.log(features);
+features.order();
+console.log(features);
+
+features.paginate();
+console.log(features);
+features.filter();
+console.log(features);
+features.findAll();
