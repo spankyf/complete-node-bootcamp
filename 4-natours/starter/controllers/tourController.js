@@ -1,7 +1,7 @@
 const db = require('../models');
 const APIFeatures = require('../utils/apiFeatures.js');
-
-// const Op = db.Op;
+const { sequelize } = db.sequelize;
+const Op = db.Op;
 const Tour = db.tours;
 
 exports.aliasTopTours = (req, res, next) => {
@@ -95,6 +95,35 @@ exports.deleteTour = async (req, res) => {
     res.status(204).json({
       status: 'success'
       // data: deletedTour
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const statsQuery = {
+      attributes: [
+        'difficulty',
+        [db.sequelize.fn('COUNT', db.sequelize.col('duration')), 'numTours'],
+        [db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'avgRating'],
+        [db.sequelize.fn('AVG', db.sequelize.col('price')), 'avgPrice'],
+        [db.sequelize.fn('MIN', db.sequelize.col('price')), 'minPrice'],
+        [db.sequelize.fn('MAX', db.sequelize.col('price')), 'maxPrice'],
+        [db.sequelize.fn('SUM', db.sequelize.col('ratingsQuantity')), 'numRatings']
+      ],
+      group: ['difficulty'],
+      order: [[db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'ASC']]
+    };
+
+    const stats = await Tour.findAll(statsQuery);
+    res.status(200).json({
+      status: 'success',
+      data: stats
     });
   } catch (err) {
     res.status(404).json({
