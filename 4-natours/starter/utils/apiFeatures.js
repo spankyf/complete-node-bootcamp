@@ -86,22 +86,26 @@ const testo = {
 };
 
 const query = new APIFeatures(Tour, testo).filter().paginate().order().limitFields();
+const testQuery = db.sequelize.query('SELECT *,UNNEST("startDates") AS "unwound" FROM tours');
+//const res = query.sequelizeModel.findAll(testQuery);
+// console.log(testQuery);
+
 // console.log(query.queryJSON);
 
 // const { sequelize } = db.sequelize;
-const statsQuery = {
-  // where: {},
-  attributes: [
-    'difficulty',
-    [db.sequelize.fn('COUNT', db.sequelize.col('duration')), 'numTours'],
-    [db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'avgRating'],
-    [db.sequelize.fn('AVG', db.sequelize.col('price')), 'avgPrice'],
-    [db.sequelize.fn('MIN', db.sequelize.col('price')), 'minPrice'],
-    [db.sequelize.fn('MAX', db.sequelize.col('price')), 'maxPrice'],
-    [db.sequelize.fn('SUM', db.sequelize.col('ratingsQuantity')), 'numRatings']
-  ],
-  group: ['difficulty'],
-  order: [[db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'DESC']]
-};
-// const res = query.sequelizeModel.findAll(query.queryJSON);
-const res = query.sequelizeModel.findAll(statsQuery);
+// const statsQuery = {
+//   // where: {},
+//   attributes: [
+//     'difficulty',
+//     [db.sequelize.fn('COUNT', db.sequelize.col('duration')), 'numTours'],
+//     [db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'avgRating'],
+//     [db.sequelize.fn('AVG', db.sequelize.col('price')), 'avgPrice'],
+//     [db.sequelize.fn('MIN', db.sequelize.col('price')), 'minPrice'],
+//     [db.sequelize.fn('MAX', db.sequelize.col('price')), 'maxPrice'],
+//     [db.sequelize.fn('SUM', db.sequelize.col('ratingsQuantity')), 'numRatings']
+//   ],
+//   group: ['difficulty'],
+//   order: [[db.sequelize.fn('AVG', db.sequelize.col('ratingsAverage')), 'DESC']]
+// };
+// // const res = query.sequelizeModel.findAll(query.queryJSON);
+// const res = query.sequelizeModel.findAll(statsQuery);

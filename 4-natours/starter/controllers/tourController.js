@@ -1,6 +1,6 @@
 const db = require('../models');
 const APIFeatures = require('../utils/apiFeatures.js');
-const { sequelize } = db.sequelize;
+
 const Op = db.Op;
 const Tour = db.tours;
 
@@ -124,6 +124,28 @@ exports.getTourStats = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: stats
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    });
+  }
+};
+
+//  lecture 102 idea: https://stackoverflow.com/questions/52177973/converting-postgresql-subquery-statement-into-sequelize-query
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    // const year = req.params.year * 1;
+
+    const plan = await db.sequelize.query('SELECT *,UNNEST("startDates") AS "unwound" FROM tours');
+    console.log(plan[0]); // array of unnested rows
+    console.log('                      *********************');
+
+    res.status(200).json({
+      status: 'success',
+      data: plan
     });
   } catch (err) {
     res.status(404).json({
