@@ -1,7 +1,7 @@
-const _ = require('lodash');
 const db = require('../models');
+const APIFeatures = require('../utils/apiFeatures.js');
 
-const Op = db.Op;
+// const Op = db.Op;
 const Tour = db.tours;
 
 exports.aliasTopTours = (req, res, next) => {
@@ -10,92 +10,6 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
-
-function paginateQuery(query) {
-  let pageNumber;
-  let limitNumber;
-  if (Object.keys(query.where).includes('page') || Object.keys(query.where).includes('limit')) {
-    if (Object.keys(query.where).includes('page')) {
-      pageNumber = query.where.page * 1;
-    } else {
-      pageNumber = 1;
-    }
-    if (Object.keys(query.where).includes('limit')) {
-      limitNumber = query.where.limit * 1;
-    } else {
-      limitNumber = 10;
-    }
-    query.limit = limitNumber;
-    query.offset = (pageNumber - 1) * limitNumber;
-    delete query.where.page;
-    delete query.where.limit;
-  } else {
-    console.log('no pagnation');
-  }
-  return query;
-}
-
-function selectFields(query) {
-  let result;
-  if (Object.keys(query.where).includes('fields')) {
-    const wherePart = _.cloneDeep(query.where); // make a deep copy
-    const sortPart = _.cloneDeep(query.order); // make a deep copy
-    delete wherePart.fields;
-    result = {
-      attributes: query.where.fields.split(','),
-      where: wherePart,
-      order: sortPart
-    };
-  } else {
-    result = query;
-  }
-  return result;
-}
-
-function sortQuery(query) {
-  let result;
-  const wherePart = _.cloneDeep(query.where); // make a deep copy
-  if (Object.keys(query.where).includes('sort')) {
-    delete wherePart.sort;
-    result = {
-      order: query.where.sort
-        .split(',')
-        .map((str) => (str.charAt(0) === '-' ? [str.substring(1), 'DESC'] : [str, 'ASC'])),
-      where: wherePart
-    };
-  } else {
-    result = {
-      order: [['price', 'DESC']],
-      where: wherePart
-    };
-  }
-  return result;
-}
-
-function advancedQuery(query) {
-  const keys = Object.keys(query);
-  for (let i = 0; i < keys.length; i += 1) {
-    const test = Object.getOwnPropertyNames(query[keys[i]]).toString();
-
-    switch (test) {
-      case 'gte':
-        query[keys[i]] = { [Op.gte]: query[keys[i]].gte };
-        break;
-      case 'lte':
-        query[keys[i]] = { [Op.lte]: query[keys[i]].lte };
-        break;
-      case 'lt':
-        query[keys[i]] = { [Op.lt]: query[keys[i]].lt };
-        break;
-      case 'gt':
-        query[keys[i]] = { [Op.gt]: query[keys[i]].gt };
-        break;
-      default:
-        break;
-    }
-  }
-  return { where: query };
-}
 
 exports.createTour = async (req, res) => {
   try {
@@ -115,19 +29,13 @@ exports.createTour = async (req, res) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    console.log(req.query, '   Is the original query');
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
+    // console.log(req.query, '   Is the original query');
 
-    const filteredQuery = advancedQuery(req.query); // advanced filtering
-    const sortedQuery = sortQuery(filteredQuery); // sort function
-    const fieldFilteredQuery = selectFields(sortedQuery); // limit fields by query
-    const query = paginateQuery(fieldFilteredQuery); // add pagination
+    const query = new APIFeatures(Tour, req.query).filter().paginate().order().limitFields();
+    // console.log(query.queryJSON);
+    const tours = await query.sequelizeModel.findAll(query.queryJSON);
 
-    console.log(query, 'query After fields');
-
-    const tours = await Tour.findAll(query);
+    console.log(typeof tours);
 
     res.status(201).json({
       status: 'success',
