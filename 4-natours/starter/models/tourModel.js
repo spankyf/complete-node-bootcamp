@@ -91,3 +91,7 @@ module.exports = (sequelize, Sequelize) => {
 
   return Tour;
 };
+
+// Tour.beforeCreate(function () {
+//   console.log('save');
+// });
