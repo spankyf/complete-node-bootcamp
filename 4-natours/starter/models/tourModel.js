@@ -35,6 +35,12 @@ module.exports = (sequelize, Sequelize) => {
         }
       }
     },
+    durationWeeks: {
+      type: Sequelize.VIRTUAL,
+      get() {
+        return this.duration / 7;
+      }
+    },
     maxGroupSize: {
       type: Sequelize.INTEGER,
       allowNull: false,
