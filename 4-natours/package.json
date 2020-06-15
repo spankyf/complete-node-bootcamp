@@ -6,7 +6,8 @@
   "scripts": {
     "start:dev": "nodemon  starter/server.js",
     "start:prod": "NODE_ENV=production nodemon  starter/server.js",
-    "testApi": "node starter/utils/apiFeatures.js"
+    "testApi": "node starter/utils/apiFeatures.js",
+    "debug": "ndb starter/server.js"
   },
   "author": "Dean Flanagan",
   "license": "ISC",
