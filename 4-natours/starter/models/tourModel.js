@@ -1,3 +1,5 @@
+const validator = require('validator');
+
 module.exports = (sequelize, Sequelize) => {
   const Tour = sequelize.define('tours', {
     id: {
@@ -10,7 +12,8 @@ module.exports = (sequelize, Sequelize) => {
     name: {
       type: Sequelize.STRING(2000),
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: [validator.isAlpha, 'Tour name must only contain characters']
     },
     ratingsAverage: {
       type: Sequelize.REAL,
@@ -51,11 +54,13 @@ module.exports = (sequelize, Sequelize) => {
       }
     },
     difficulty: {
-      type: Sequelize.STRING(2000),
+      type: Sequelize.ENUM('easy', 'medium', 'difficult'),
       allowNull: false,
+      //values: ['easy', 'medium', 'difficult'],
       validate: {
-        notNull: {
-          msg: 'A tour has to have a difficulty'
+        isIn: {
+          args: [Object.values(['easy', 'medium', 'difficult'])],
+          msg: 'Difficulty can only be one of easy, medium, difficult'
         }
       }
     },

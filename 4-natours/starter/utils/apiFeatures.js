@@ -31,7 +31,8 @@ class APIFeatures {
 
   paginate() {
     this.queryJSON.page = Object.keys(this.queryJSON).includes('page') ? this.queryJSON.page * 1 : 1;
-    this.queryJSON.offset = Object.keys(this.queryJSON).includes('limit') ? this.queryJSON.limit * 1 : 5;
+    this.queryJSON.offset = Object.keys(this.queryJSON).includes('limit') ? this.queryJSON.limit * 1 : 0;
+    console.log('The offset is', this.queryJSON.offset);
     delete this.queryJSON.limit;
     // console.log('Pagination complete');
 
@@ -75,18 +76,18 @@ class APIFeatures {
 
 module.exports = APIFeatures;
 
-const Tour = db.tours;
-const testo = {
-  duration: { gte: '7' },
-  price: { gt: 1000 },
-  page: '2',
-  limit: '3',
-  sort: '-price,duration',
-  fields: 'name,duration,price'
-};
+// const Tour = db.tours;
+// const testo = {
+//   duration: { gte: '7' },
+//   price: { gt: 1000 },
+//   page: '2',
+//   limit: '3',
+//   sort: '-price,duration',
+//   fields: 'name,duration,price'
+// };
 
-const query = new APIFeatures(Tour, testo).filter().paginate().order().limitFields();
-const testQuery = db.sequelize.query('SELECT *,UNNEST("startDates") AS "unwound" FROM tours');
+//const query = new APIFeatures(Tour, testo).filter().paginate().order().limitFields();
+//const testQuery = db.sequelize.query('SELECT *,UNNEST("startDates") AS "unwound" FROM tours');
 //const res = query.sequelizeModel.findAll(testQuery);
 // console.log(testQuery);
 
