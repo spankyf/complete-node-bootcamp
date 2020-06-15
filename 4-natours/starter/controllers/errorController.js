@@ -7,10 +7,12 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errors[0];
+  const errors = Object.values(err.errors).map((el) => el.message);
+  //const errMessage = err.errors[0].message;
+  //const val = err.errors[0].value;
   //console.log(err.errors[0].message);
   //console.log(value.value);
-  const message = `Duplicate fields for ${value.value} . Use another value`;
+  const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
@@ -24,7 +26,7 @@ const sendErrorProd = (err, res) => {
     res.status(err.statusCode).json({ status: err.status, message: err.message });
   } else {
     // Other unknown erro, dont send details
-    console.log('ERROR', err);
+    //console.log('ERROR', err);
     res.status(500).json({ status: 'error', message: 'Somethign went very wrong' });
   }
 };
@@ -37,10 +39,9 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-
+    //console.log(error);
     if (error.name === 'SequelizeDatabaseError') error = handleCastErrorDB(error);
-    if (error.name === 'SequelizeValidationError') error = handleDuplicateFieldsDB(error);
-    //if (error.errors[0].message.name === 'Invalid validator function: 1') error = handleDuplicateFieldsDB(error);
+    if (error.name === 'SequelizeUniqueConstraintError') error = handleDuplicateFieldsDB(error);
     sendErrorProd(error, res);
   }
 };

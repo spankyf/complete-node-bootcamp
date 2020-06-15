@@ -12,8 +12,12 @@ module.exports = (sequelize, Sequelize) => {
     name: {
       type: Sequelize.STRING(2000),
       allowNull: false,
-      unique: true,
-      validate: [validator.isAlpha, 'Tour name must only contain characters']
+      unique: true
+      // validate: {
+      //   unique: {
+      //     messsge: 'Has to be unique'
+      //   }
+      // }
     },
     ratingsAverage: {
       type: Sequelize.REAL,
