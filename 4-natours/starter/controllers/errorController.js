@@ -1,17 +1,17 @@
 const AppError = require('../utils/appError');
 
 const handleCastErrorDB = (err) => {
-  //console.log(err);
   const message = `Invalid ${err.original} : ${err.name}`;
+  return new AppError(message, 400);
+};
+const handleValidationDB = (err) => {
+  const errors = Object.values(err.errors).map((el) => el.message);
+  const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
 const handleDuplicateFieldsDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
-  //const errMessage = err.errors[0].message;
-  //const val = err.errors[0].value;
-  //console.log(err.errors[0].message);
-  //console.log(value.value);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
@@ -39,9 +39,11 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-    //console.log(error);
+    console.log(err);
+    console.log(error);
     if (error.name === 'SequelizeDatabaseError') error = handleCastErrorDB(error);
     if (error.name === 'SequelizeUniqueConstraintError') error = handleDuplicateFieldsDB(error);
+    if (error.name === 'SequelizeValidationError') error = handleValidationDB(error);
     sendErrorProd(error, res);
   }
 };

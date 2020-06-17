@@ -1,4 +1,12 @@
-// const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const AppError = require('../utils/appError');
+
+// async function hashPassword(user, options) {
+//   if (!user.changed('password')) {
+//     return 0;
+//   }
+//   user.password = await bcrypt.hash(user.password, SALT_FACTOR);
+// }
 
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('users', {
@@ -42,8 +50,27 @@ module.exports = (sequelize, Sequelize) => {
     passwordConfirm: {
       type: Sequelize.STRING,
       allowNull: false,
-      validate: { notNull: { msg: 'Please confirm password' } }
+      validate: {
+        function(el) {
+          if (el !== this.password) {
+            throw new AppError('The passwords dont match');
+          }
+        }
+      }
     }
+  });
+
+  User.beforeCreate(async (user, options) => {
+    if (!user.changed('password')) {
+      return 0;
+    }
+    user.password = await bcrypt.hash(user.password, 12);
+  });
+  User.beforeUpdate(async (user, options) => {
+    if (!user.changed('password')) {
+      return 0;
+    }
+    user.password = await bcrypt.hash(user.password, 12);
   });
 
   return User;
