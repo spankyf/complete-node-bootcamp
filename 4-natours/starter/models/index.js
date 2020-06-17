@@ -30,5 +30,6 @@ sequelizePaginate.paginate(sequelize);
 db.Op = Sequelize.Op;
 
 db.tours = require('./tourModel')(sequelize, Sequelize);
+db.users = require('./userModel')(sequelize, Sequelize);
 
 module.exports = db;

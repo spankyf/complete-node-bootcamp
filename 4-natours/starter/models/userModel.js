@@ -4,7 +4,7 @@ module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('users', {
     name: {
       type: Sequelize.STRING(200),
-      //   allowNull: false,
+      allowNull: false,
       validate: {
         notNull: {
           msg: 'A user has to have a name'
@@ -13,13 +13,14 @@ module.exports = (sequelize, Sequelize) => {
     },
     email: {
       type: Sequelize.STRING,
-      //   allowNull: false,
-      //   unique: true,
+      allowNull: false,
+      notEmpty: true,
       validate: {
-        isEmail: true,
-        unique: {
-          messsge: 'Has to be unique'
-        }
+        isEmail: true
+      },
+      unique: {
+        args: true,
+        msg: 'Email address already in use!'
       }
     },
     photo: {
@@ -27,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     password: {
       type: Sequelize.STRING,
-      //   allowNull: false,
+      allowNull: false,
       validate: {
         notNull: {
           msg: 'A password is required'
@@ -38,7 +39,11 @@ module.exports = (sequelize, Sequelize) => {
         }
       }
     },
-    passwordConfirm: { type: Sequelize.STRING, validate: { notNull: { msg: 'Please confirm password' } } }
+    passwordConfirm: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      validate: { notNull: { msg: 'Please confirm password' } }
+    }
   });
 
   return User;
