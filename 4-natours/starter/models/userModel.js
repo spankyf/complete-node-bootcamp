@@ -49,7 +49,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     passwordConfirm: {
       type: Sequelize.STRING,
-      allowNull: false,
+      // allowNull: false,
       validate: {
         function(el) {
           if (el !== this.password) {
