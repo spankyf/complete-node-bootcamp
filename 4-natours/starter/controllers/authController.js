@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
@@ -37,4 +38,23 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const token = signToken(user.id);
   res.status(200).json({ status: 'success', token });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // this is to protect unauth access to routes
+  // 1 get token and check if it is there
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('You are not logged in!', 401));
+  }
+  // 2 verification token - make it a promise
+  const decoded = promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  // 3 if successful, check if user still exists
+  // 4 check if user changed password sicne token issued
+  next();
 });
