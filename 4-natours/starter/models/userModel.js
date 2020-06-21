@@ -59,7 +59,8 @@ module.exports = (sequelize, Sequelize) => {
             }
           }
         }
-      }
+      },
+      passwordChangedAt: { type: Sequelize.DATE }
     },
     {
       defaultScope: {
@@ -84,6 +85,15 @@ module.exports = (sequelize, Sequelize) => {
 
   User.prototype.correctPassword = async function (candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
+  };
+
+  User.prototype.changedPasswordAfter = function (JWTTimestamp) {
+    if (this.passwordChangedAt) {
+      const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+      console.log(changedTimestamp, JWTTimestamp);
+      return JWTTimestamp < changedTimestamp;
+    }
+    return false;
   };
 
   return User;

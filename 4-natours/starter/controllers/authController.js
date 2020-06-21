@@ -16,7 +16,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm
+    passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt
   });
 
   const token = signToken(newUser.id);
@@ -44,8 +45,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   // this is to protect unauth access to routes
   // 1 get token and check if it is there
-  //console.log(req.headers);
-  console.log('one');
+
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
@@ -54,14 +54,21 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) {
     return next(new AppError('You are not logged in!', 401));
   }
-  console.log('two');
-  // 2 verification token - make it a promise
-  //const ress = jwt.verify(token, process.env.JWT_SECRET);
-  //console.log(ress);
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
 
-  // 3 if successful, check if user still exists
+  // 2 verification token - make it a promise
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // 3 if successful, check if user still exists - could have changed password before jwt expiration
+
+  const freshUser = await User.findByPk(decoded.id);
+  if (!freshUser) {
+    return next(new AppError('The user with this token no longer exists', 401));
+  }
   // 4 check if user changed password sicne token issued
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError('User recently changed password. Please login again.', 401));
+  }
+  req.user = freshUser;
   next();
 });

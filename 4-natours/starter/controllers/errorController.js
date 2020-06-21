@@ -10,8 +10,12 @@ const handleValidationDB = (err) => {
   return new AppError(message, 400);
 };
 
-const handleJWTError = (err) => {
+const handleJWTError = () => {
   return new AppError('Invalide token. Please log in again!', 401);
+};
+
+const handleJWTExpiredError = () => {
+  return new AppError('Your token has expired. Please login again', 401);
 };
 
 const handleDuplicateFieldsDB = (err) => {
@@ -48,6 +52,7 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'SequelizeUniqueConstraintError') error = handleDuplicateFieldsDB(error);
     if (error.name === 'SequelizeValidationError') error = handleValidationDB(error);
     if (error.name === 'JsonWebTokenError') error = handleJWTError(error);
+    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
     sendErrorProd(error, res);
   }
 };
