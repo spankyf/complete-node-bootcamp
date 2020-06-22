@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const AppError = require('../utils/appError');
 
@@ -61,7 +62,9 @@ module.exports = (sequelize, Sequelize) => {
           }
         }
       },
-      passwordChangedAt: { type: Sequelize.DATE }
+      passwordChangedAt: { type: Sequelize.DATE },
+      passwordResetToken: { type: Sequelize.STRING },
+      passwordResetTokenExpires: { type: Sequelize.DATE }
     },
     {
       defaultScope: {
@@ -95,6 +98,15 @@ module.exports = (sequelize, Sequelize) => {
       return JWTTimestamp < changedTimestamp;
     }
     return false;
+  };
+
+  User.prototype.createPasswordResetToken = function () {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000;
+    this.save();
+    return resetToken;
   };
 
   return User;
