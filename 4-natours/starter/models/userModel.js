@@ -36,6 +36,7 @@ module.exports = (sequelize, Sequelize) => {
       photo: {
         type: Sequelize.STRING
       },
+      role: { type: Sequelize.ENUM(['user', 'guide', 'lead-guide', 'admin']), defaultValue: 'user' },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
