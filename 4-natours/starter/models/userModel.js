@@ -46,7 +46,7 @@ module.exports = (sequelize, Sequelize) => {
             msg: 'A password is required'
           },
           len: {
-            args: [8, 32],
+            args: [8, 255],
             msg: 'String length is not in this range'
           }
         }

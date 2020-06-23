@@ -15,7 +15,7 @@ const sendEmail = async (options) => {
     from: 'Dean Flanagan <mickie@timmy.ass>',
     to: options.email,
     subject: options.subject,
-    text: options.text
+    text: options.message
   };
   console.log('                      ***');
   //   console.log(transporter);
