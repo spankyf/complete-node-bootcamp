@@ -80,6 +80,13 @@ module.exports = (sequelize, Sequelize) => {
     }
     user.password = await bcrypt.hash(user.password, 12);
   });
+
+  User.beforeUpdate(async (user, options) => {
+    if (!user.changed('password') || user.isNewRecord) return 0;
+    user.passwordChangedAt = Date.now() - 1000;
+    //next(); think you dont need next when using hooks
+  });
+
   User.beforeUpdate(async (user, options) => {
     if (!user.changed('password')) {
       return 0;
