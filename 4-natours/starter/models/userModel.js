@@ -64,13 +64,14 @@ module.exports = (sequelize, Sequelize) => {
       },
       passwordChangedAt: { type: Sequelize.DATE },
       passwordResetToken: { type: Sequelize.STRING },
-      passwordResetTokenExpires: { type: Sequelize.DATE }
+      passwordResetTokenExpires: { type: Sequelize.DATE },
+      active: { type: Sequelize.BOOLEAN, defaultValue: true }
     },
     {
       defaultScope: {
         where: {}
       },
-      scopes: { returnAll: { attributes: { exclude: ['password'] } } }
+      scopes: { returnAll: { where: { active: true }, attributes: { exclude: ['password', 'active'] } } } //  this is used in find all users
     }
   );
 
@@ -83,6 +84,12 @@ module.exports = (sequelize, Sequelize) => {
 
   User.beforeUpdate(async (user, options) => {
     if (!user.changed('password') || user.isNewRecord) return 0;
+    user.passwordChangedAt = Date.now() - 1000;
+    //next(); think you dont need next when using hooks
+  });
+
+  User.beforeFind(async (user, options) => {
+    if (!user.active) return 0;
     user.passwordChangedAt = Date.now() - 1000;
     //next(); think you dont need next when using hooks
   });

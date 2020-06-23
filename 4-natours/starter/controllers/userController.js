@@ -36,6 +36,11 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: { user: updatedUser } });
 });
 
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  const inactiveUser = await User.update({ active: false }, { where: { id: req.user.id } });
+  res.status(204).json({ status: 'success', data: null });
+});
+
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
