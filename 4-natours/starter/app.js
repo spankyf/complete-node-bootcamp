@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/appError');
@@ -8,13 +10,24 @@ const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 // Postman collections https://www.getpostman.com/collections/777b681937a7f1001269
 // 1 Middleware
-console.log(process.env.NODE_ENV);
+
+app.use(helmet());
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requets from this IP, try again in an hour.'
+});
+app.use('/api', limiter);
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
+  console.log(process.env.NODE_ENV);
 }
-app.use(express.json());
-app.use(express.static(`${__dirname}/public`));
+// body parser
+app.use(express.json({ limit: '10kb' }));
 
+app.use(express.static(`${__dirname}/public`));
+// test middleawre
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   //console.log(req.headers);
