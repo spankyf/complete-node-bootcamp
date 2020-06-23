@@ -1,13 +1,21 @@
 const catchAsync = require('../utils/catchAsync');
 const db = require('../models');
+const AppError = require('../utils/appError');
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObject = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObject[el] = obj[el];
+  });
+  //console.log(obj);
+  //console.log(newObject);
+  return newObject;
+};
 
 const User = db.users;
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  //const query = new APIFeatures(Tour, req.query).filter().paginate().order().limitFields();
-  //const tours = await query.sequelizeModel.findAll(query.queryJSON);
   const users = await User.scope('returnAll').findAll(req.query);
-  //console.log(users);
 
   res.status(200).json({
     status: 'success',
@@ -15,6 +23,19 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     data: users
   });
 });
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  // 1 create error if users posts paswwrod data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(new AppError('This route is not for password update, please use updateMyPassword', 400));
+  }
+
+  // 2 if not update user row. Only allow certain fields to be changed
+  const filteredBody = filterObj(req.body, 'name', 'email');
+  const updatedUser = await User.update(filteredBody, { where: { id: req.user.id }, returning: true });
+  res.status(200).json({ status: 'success', data: { user: updatedUser } });
+});
+
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
