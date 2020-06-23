@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const tourRouter = require('./routes/tourRoutes');
@@ -25,6 +27,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 // body parser
 app.use(express.json({ limit: '10kb' }));
+
+// js sanization of data
+app.use(xss());
+
+// prevent parameter pollution
+app.use(hpp({ whitelist: ['duration'] }));
 
 app.use(express.static(`${__dirname}/public`));
 // test middleawre
