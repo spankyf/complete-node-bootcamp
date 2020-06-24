@@ -22,7 +22,9 @@ exports.createTour = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
+  //console.log(req);
   const query = new APIFeatures(Tour, req.query).filter().paginate().order().limitFields();
+  //console.log(query.queryJSON);
   const tours = await query.sequelizeModel.findAll(query.queryJSON);
 
   res.status(201).json({
@@ -100,8 +102,8 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
 
 exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const plan = await db.sequelize.query('SELECT *,UNNEST("startDates") AS "unwound" FROM tours');
-  console.log(plan[0]); // array of unnested rows
-  console.log('                      *********************');
+  //console.log(plan[0]); // array of unnested rows
+  //console.log('                      *********************');
 
   res.status(200).json({
     status: 'success',

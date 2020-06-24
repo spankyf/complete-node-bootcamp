@@ -32,7 +32,7 @@ class APIFeatures {
   paginate() {
     this.queryJSON.page = Object.keys(this.queryJSON).includes('page') ? this.queryJSON.page * 1 : 1;
     this.queryJSON.offset = Object.keys(this.queryJSON).includes('limit') ? this.queryJSON.limit * 1 : 0;
-    console.log('The offset is', this.queryJSON.offset);
+    //console.log('The offset is', this.queryJSON.offset);
     delete this.queryJSON.limit;
     // console.log('Pagination complete');
 
@@ -40,16 +40,20 @@ class APIFeatures {
   }
 
   filter() {
+    //console.log('                  ***');
+    //console.log(this);
     const filteredArray = Object.keys(this.queryJSON).filter(
       (word) => !['page', 'attributes', 'order', 'offset', 'limit', 'sort', 'fields'].includes(word)
     );
     if (filteredArray.indexOf('where') === -1) {
       this.queryJSON.where = {};
     }
+    //console.log(this);
+    //console.log(filteredArray);
     for (let i = 0; i < filteredArray.length; i += 1) {
       const operatorStr = Object.getOwnPropertyNames(this.queryJSON[filteredArray[i]]).toString();
       let newObj = {};
-
+      //console.log(operatorStr);
       switch (operatorStr) {
         case 'gte':
           newObj = { [Op.gte]: this.queryJSON[filteredArray[i]].gte };
@@ -64,12 +68,15 @@ class APIFeatures {
           newObj = { [Op.gt]: this.queryJSON[filteredArray[i]].gt };
           break;
         default:
+          //console.log(this.queryJSON[filteredArray[i]]);
+          newObj = this.queryJSON[filteredArray[i]];
           break;
       }
+
       this.queryJSON.where[filteredArray[i]] = newObj;
       delete this.queryJSON[filteredArray[i]];
     }
-    // console.log('Filtering complete');
+    //console.log(this);
     return this;
   }
 }

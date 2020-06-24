@@ -32,7 +32,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(xss());
 
 // prevent parameter pollution
-app.use(hpp({ whitelist: ['duration'] }));
+app.use(hpp({ whitelist: ['difficulty', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'duration', 'price'] }));
 
 app.use(express.static(`${__dirname}/public`));
 // test middleawre
