@@ -6,7 +6,7 @@ const db = require('../../models');
 // const moment = require('moment');
 
 const Tour = db.tours;
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`));
 
 const importData = async (req, res) => {
   try {

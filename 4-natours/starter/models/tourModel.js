@@ -2,10 +2,10 @@
 
 module.exports = (sequelize, Sequelize) => {
   const Tour = sequelize.define('tours', {
-    id: {
+    _id: {
       // type: Sequelize.UUID,
       // defaultValue: Sequelize.UUIDV1,
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       primaryKey: true,
       unique: true
     },
@@ -63,7 +63,7 @@ module.exports = (sequelize, Sequelize) => {
       //values: ['easy', 'medium', 'difficult'],
       validate: {
         isIn: {
-          args: [Object.values(['easy', 'medium', 'difficult'])],
+          //args: [Object.values(['easy', 'medium', 'difficult'])],
           msg: 'Difficulty can only be one of easy, medium, difficult'
         }
       }
@@ -101,7 +101,9 @@ module.exports = (sequelize, Sequelize) => {
     images: {
       type: Sequelize.ARRAY(Sequelize.STRING(2000))
     },
-    startDates: { type: Sequelize.ARRAY(Sequelize.DATE) }
+    startDates: { type: Sequelize.ARRAY(Sequelize.DATE) },
+    startLocation: { type: Sequelize.GEOGRAPHY('POINT', 4326) },
+    locations: { type: Sequelize.ARRAY(Sequelize.GEOGRAPHY('POINT', 4326)) }
   });
 
   return Tour;

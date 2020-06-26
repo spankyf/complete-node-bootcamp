@@ -12,7 +12,7 @@ const app = require('./app');
 
 const db = require('./models');
 // was set to { force: true }, now I changed it and seems to keep the data once server restarted. Use node dev... and --import right after
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
   console.log('Drop and re-sync db.');
 });
 
