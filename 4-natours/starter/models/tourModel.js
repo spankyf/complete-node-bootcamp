@@ -63,7 +63,7 @@ module.exports = (sequelize, Sequelize) => {
       //values: ['easy', 'medium', 'difficult'],
       validate: {
         isIn: {
-          //args: [Object.values(['easy', 'medium', 'difficult'])],
+          args: [Object.values(['easy', 'medium', 'difficult'])],
           msg: 'Difficulty can only be one of easy, medium, difficult'
         }
       }
