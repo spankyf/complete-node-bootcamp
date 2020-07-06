@@ -103,7 +103,8 @@ module.exports = (sequelize, Sequelize) => {
     },
     startDates: { type: Sequelize.ARRAY(Sequelize.DATE) },
     startLocation: { type: Sequelize.GEOGRAPHY('POINT', 4326) },
-    locations: { type: Sequelize.ARRAY(Sequelize.GEOGRAPHY('POINT', 4326)) }
+    locations: { type: Sequelize.ARRAY(Sequelize.GEOGRAPHY('POINT', 4326)) },
+    guides: { type: Sequelize.ARRAY(Sequelize.STRING) }
   });
 
   return Tour;
