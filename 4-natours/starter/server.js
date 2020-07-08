@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+const importData = require('./dev-data/data/import-dev-data');
 
 process.on('uncaughtException', (err) => {
   console.log(err.name, err.message);
@@ -12,7 +13,8 @@ const app = require('./app');
 
 const db = require('./models');
 // was set to { force: true }, now I changed it and seems to keep the data once server restarted. Use node dev... and --import right after
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
+  importData();
   console.log('Drop and re-sync db.');
 });
 

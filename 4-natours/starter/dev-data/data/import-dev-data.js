@@ -5,12 +5,13 @@ const fs = require('fs');
 const db = require('../../models');
 // const moment = require('moment');
 
-const Tour = db.tours;
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`));
 
 const importData = async (req, res) => {
   try {
-    await Tour.bulkCreate(tours);
+    await db.tours.bulkCreate(tours);
+    await db.users.bulkCreate(users);
     console.log('Data inserted successfully');
   } catch (err) {
     console.log(err);
